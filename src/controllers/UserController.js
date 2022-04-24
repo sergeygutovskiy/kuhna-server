@@ -62,7 +62,7 @@ const register = async (req, res) => {
 
     res.json({
         token: token,
-        id: user.id,
+        id: result.insertId,
     });
 };
 
