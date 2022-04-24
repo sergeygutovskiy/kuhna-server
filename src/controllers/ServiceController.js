@@ -54,9 +54,8 @@ const update = async (req, res) => {
     const params = req.body;
     const number = params.number;
     const description = params.description;
-    const avatar_path = params.avatar_path;
+    const avatar_path = params.avatar_path !== '' ? params.avatar_path : null;
 
-    if ( !avatar_path ) avatar_path = null;
     if ( !number || !description ) return req.sendStatus(403);
 
     const connection = await getConnection();
