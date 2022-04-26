@@ -24,7 +24,7 @@ const create_services_table = async () => {
         CREATE TABLE services(
             id INT NOT NULL AUTO_INCREMENT,
             owner_id INT NOT NULL,
-            number VARCHAR(255) NOT NULL UNIQUE,
+            number VARCHAR(255) NOT NULL,
             avatar_path VARCHAR(255),
             description VARCHAR(510) NOT NULL,
             PRIMARY KEY(id),

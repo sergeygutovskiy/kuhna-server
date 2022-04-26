@@ -3,7 +3,14 @@ import { getConnection } from "../utils";
 const all = async (req, res) => {
     const connection = await getConnection();
     const userQuery = `
-        SELECT *, users.avatar_path as user_avatar_path FROM services
+        SELECT 
+            services.id, services.number, services.owner_id,
+            services.description, services.avatar_path,
+
+            users.name as owner_name,
+            users.email as owner_email,
+            users.avatar_path as owner_avatar_path
+        FROM services
         JOIN users ON (users.id = owner_id)
     `;
     const [ result ] = await connection.execute(userQuery);
@@ -13,10 +20,10 @@ const all = async (req, res) => {
         description: item.description,
         avatar_path: item.avatar_path,
         owner: {
-            id: item.id,
-            name: item.name,
-            email: item.email,
-            avatar_path: item.user_avatar_path,
+            id: item.owner_id,
+            name: item.owner_name,
+            email: item.owner_email,
+            avatar_path: item.owner_avatar_path,
         },
     }));
 
@@ -50,26 +57,26 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     const id = req.params.id;
-    const user = req.user;
     const params = req.body;
     const number = params.number;
     const description = params.description;
     const avatar_path = params.avatar_path !== '' ? params.avatar_path : null;
 
+    console.log(avatar_path);
+
     if ( !number || !description ) return req.sendStatus(403);
 
     const connection = await getConnection();
     const query = `
-        UPDATE services
+        UPDATE IGNORE services
         SET number = ?, description = ?, avatar_path = ?
-        WHERE id = ? AND owner_id = ?
+        WHERE id = ?
     `;
     await connection.execute(query, [
         number,
         description,
         avatar_path,
-        id,
-        user,
+        id
     ]);
 
     res.end();
@@ -82,9 +89,9 @@ const remove = async (req, res) => {
     const connection = await getConnection();
     const query = `
         DELETE FROM services
-        WHERE id = ? AND owner_id = ?
+        WHERE id = ?
     `;
-    await connection.execute(query, [ serviceId, user ]);
+    await connection.execute(query, [ serviceId ]);
 
     res.end();
 };
